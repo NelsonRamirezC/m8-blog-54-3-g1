@@ -1,5 +1,6 @@
 import Usuario from "../models/Usuario.model.js";
 import sequelize from "../config/db.js";
+import { generarHash } from "../utils/utils.js";
 
 export const getAllUsuarios = async (req, res) => {
     try {
@@ -50,7 +51,8 @@ export const createUsuario = async (req, res) => {
                 });
         }
 
-        const newUsuario = await Usuario.create({ nombre, email, password }, {transaction: t});
+        let passwordHash = generarHash(password);
+        const newUsuario = await Usuario.create({ nombre, email, passwordHash }, {transaction: t});
 
         await t.commit();
         res.json({ status: "ok", usuario: newUsuario });
