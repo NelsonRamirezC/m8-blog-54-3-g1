@@ -52,7 +52,7 @@ export const createUsuario = async (req, res) => {
         }
 
         let passwordHash = generarHash(password);
-        const newUsuario = await Usuario.create({ nombre, email, passwordHash }, {transaction: t});
+        const newUsuario = await Usuario.create({ nombre, email, password: passwordHash }, {transaction: t});
 
         await t.commit();
         res.json({ status: "ok", usuario: newUsuario });
