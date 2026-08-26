@@ -9,3 +9,10 @@ const generarHash = (password) => {
 
     return hash;
 }
+
+
+let miHash = generarHash("123456");
+
+let result = bcrypt.compareSync("123456", miHash);
+
+console.log(result);

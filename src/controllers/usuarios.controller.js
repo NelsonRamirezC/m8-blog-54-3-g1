@@ -1,6 +1,6 @@
 import Usuario from "../models/Usuario.model.js";
 import sequelize from "../config/db.js";
-import { generarHash } from "../utils/utils.js";
+import { generarHash, decodeHash } from "../utils/utils.js";
 
 export const getAllUsuarios = async (req, res) => {
     try {
@@ -88,7 +88,7 @@ export const login = async (req, res) => {
             transaction: t
         });
 
-        if (!usuario || usuario.password != password) {
+        if (!usuario || !decodeHash(password, usuario.password)) {
             await t.rollback();
             return res
                 .status(400)

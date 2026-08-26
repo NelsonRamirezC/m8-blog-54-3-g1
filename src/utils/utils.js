@@ -9,3 +9,7 @@ export const generarHash = (password) => {
 
     return hash;
 }
+
+export const decodeHash = (password, hash) => {
+    return bcrypt.compareSync(password, hash);
+}
