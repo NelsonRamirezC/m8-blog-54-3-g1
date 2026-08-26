@@ -60,3 +60,48 @@ export const createUsuario = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
+
+
+export const login = async (req, res) => {
+
+    const t = await sequelize.transaction();
+    try {
+        let { email, password} = req.body;
+
+        if (!email || !password) {
+            await t.rollback();
+            return res
+                .status(400)
+                .json({
+                    status: "fail",
+                    message: `No se proporcionan los campos requeridos: [email, password].`,
+                });
+        }
+
+        const usuario = await Usuario.findOne({
+            where: {
+                email,
+            },
+            transaction: t
+        });
+
+        if (!usuario || usuario.password != password) {
+            await t.rollback();
+            return res
+                .status(400)
+                .json({
+                    status: "fail",
+                    message: `Credenciales inválidas`,
+                });
+        }
+
+        await t.commit();
+
+        res.json({ status: "ok", message: "Login correcto." });
+    } catch (error) {
+        await t.rollback();
+        console.log(error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};

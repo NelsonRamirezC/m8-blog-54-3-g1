@@ -11,5 +11,8 @@ usuariosRoutes.get("/", usuariosController.getAllUsuarios);
 //REGISTRAR NUEVOS USUARIOS
 usuariosRoutes.post("/", validateBody, usuariosController.createUsuario);
 
+//VALIDAR CREDENCIALES DEL USUARIO
+usuariosRoutes.post("/login", validateBody, usuariosController.login);
+
 
 export default usuariosRoutes;
