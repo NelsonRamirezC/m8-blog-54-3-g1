@@ -8,6 +8,12 @@ const usuariosRoutes = express.Router();
 //OBTENER TODOS LOS USUARIOS
 usuariosRoutes.get("/", usuariosController.getAllUsuarios);
 
+//ACTUALIZAR DATOS DEL USUARIO
+usuariosRoutes.put("/:id", validateBody, usuariosController.updateUsuario);
+
+//ELIMINAR USUARIO
+usuariosRoutes.delete("/:id", usuariosController.deleteUsuario);
+
 //REGISTRAR NUEVOS USUARIOS
 usuariosRoutes.post("/", validateBody, usuariosController.createUsuario);
 

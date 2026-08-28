@@ -12,6 +12,7 @@ const generarHash = (password) => {
 
 
 let miHash = generarHash("123456");
+console.log(miHash);
 
 let result = bcrypt.compareSync("123456", miHash);
 
