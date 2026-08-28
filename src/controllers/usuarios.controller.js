@@ -1,18 +1,39 @@
 import Usuario from "../models/Usuario.model.js";
 import sequelize from "../config/db.js";
 import { generarHash, decodeHash } from "../utils/utils.js";
-import { where } from "sequelize";
 
 export const getAllUsuarios = async (req, res) => {
     try {
-        const usuarios = await Usuario.findAll({
+        let { limit, offset, sortBy, order } = req.query;
+
+        console.log(limit, offset, sortBy, order);
+
+        // 1. Whitelist de campos y sentidos permitidos
+        const allowedFields = ["id", "nombre", "email"];
+        const allowedOrders = ["ASC", "DESC"];
+
+        // 2. Construir la cláusula de ordenamiento opcional
+        let orderClause = undefined;
+
+        if (sortBy && allowedFields.includes(sortBy)) {
+            const direction = allowedOrders.includes(order?.toUpperCase())
+                ? order.toUpperCase()
+                : "ASC";
+
+            orderClause = [[sortBy, direction]];
+        }
+
+        console.log(orderClause);
+
+        // 3. Consulta con paginación y orden dinámico
+        const { count, rows } = await Usuario.findAndCountAll({
             attributes: ["id", "nombre", "email"],
-            // where: {
-            //     admin: false
-            // }
+            offset: offset ? Number(offset) : undefined,
+            limit: limit ? Number(limit) : undefined,
+            order: orderClause,
         });
 
-        res.json({ status: "ok", usuarios });
+        res.json({ status: "ok", totalUsuarios: count, usuarios: rows });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Error interno del servidor" });
@@ -140,19 +161,16 @@ export const updateUsuario = async (req, res) => {
     }
 };
 
-
 //ELIMINAR USUARIOS POR ID
 export const deleteUsuario = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-
         let { id } = req.params;
 
         const result = await Usuario.destroy({
             where: { id },
-            transaction: t
+            transaction: t,
         });
-
 
         if (result == 0) {
             await t.rollback();
@@ -161,10 +179,12 @@ export const deleteUsuario = async (req, res) => {
                 message: `No se encontró ningún usuario con id: ${id}, en la BD.`,
             });
         }
-        
 
         await t.commit();
-        res.json({ status: "ok", message: `Usuario con ID: ${id} eliminado con éxito.`});
+        res.json({
+            status: "ok",
+            message: `Usuario con ID: ${id} eliminado con éxito.`,
+        });
     } catch (error) {
         await t.rollback();
         console.log(error);
