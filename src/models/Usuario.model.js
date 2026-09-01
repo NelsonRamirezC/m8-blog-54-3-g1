@@ -51,6 +51,7 @@ Usuario.init(
         modelName: "usuario",
         tableName: "usuarios",
         timestamps: false, // Cámbialo a true si la tabla maneja createdAt/updatedAt
+        underscored: true
     },
 );
 

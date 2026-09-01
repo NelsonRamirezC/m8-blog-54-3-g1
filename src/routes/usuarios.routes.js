@@ -20,5 +20,8 @@ usuariosRoutes.post("/", validateBody, usuariosController.createUsuario);
 //VALIDAR CREDENCIALES DEL USUARIO
 usuariosRoutes.post("/login", validateBody, usuariosController.login);
 
+//OBTENER AVATAR DE USUARIOS COMO IMAGEN
+usuariosRoutes.get("/:id/avatar", usuariosController.getAvatar);
+
 
 export default usuariosRoutes;

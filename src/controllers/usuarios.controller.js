@@ -45,6 +45,8 @@ export const createUsuario = async (req, res) => {
     try {
         let { nombre, email, password } = req.body;
 
+        let { avatar } = req.files;
+
         if (!nombre || !email || !password) {
             await t.rollback();
             return res.status(400).json({
@@ -68,14 +70,58 @@ export const createUsuario = async (req, res) => {
             });
         }
 
+        let formatosPermitidos = ["jpg", "jpeg", "png", "svg"];
+
+        if (avatar) {
+            let extension = avatar.mimetype.split("/")[1];
+
+            if (!formatosPermitidos.includes(extension)) {
+                await t.rollback();
+                return res.status(400).json({
+                    status: "fail",
+                    message: "Formato de imagen no permitido...",
+                });
+            }
+        }
+
+        //VALIDAR SI TAMAÑO DEL ARCHIVO
+        const LIMIT_MB_AVATAR = 5 * 1024 * 1024; //5 MBS
+
+        if (avatar.size > LIMIT_MB_AVATAR) {
+            await t.rollback();
+            return res.status(400).json({
+                status: "fail",
+                message: `Tamaño de imagen supera el límite permito de 5mbs.`,
+            });
+        }
+
+
+
         let passwordHash = generarHash(password);
-        const newUsuario = await Usuario.create(
-            { nombre, email, password: passwordHash },
+
+
+        //TOMAR DATA EN BINARIO COMPATIBLE CON CAMPO DE TIPO BLOB DE POSTGRESQL Y EL MIMETYPE
+
+        const imgAvatar = avatar.data;
+        const mimetype = avatar.mimetype;
+
+
+
+        let newUsuario = await Usuario.create(
+            { nombre, email, password: passwordHash, imgAvatar, mimetype },
             { transaction: t },
         );
 
+        newUsuario = newUsuario.toJSON();
+
+        let usuarioObj = { 
+            id: newUsuario.id,
+            nombre: newUsuario.nombre,
+            email: newUsuario.email
+        }
+
         await t.commit();
-        res.json({ status: "ok", usuario: newUsuario });
+        res.json({ status: "ok", usuario: usuarioObj });
     } catch (error) {
         await t.rollback();
         console.log(error);
@@ -191,3 +237,33 @@ export const deleteUsuario = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
+
+//ELIMINAR USUARIOS POR ID
+export const getAvatar = async (req, res) => {
+    try {
+        let { id } = req.params;
+
+        const usuario = await Usuario.findByPk(id, {
+            attributes: ["imgAvatar", "mimetype"]
+        });
+
+        if(!usuario){
+            return res.status(400).json({ status: "fail", message: "No existe un usuaro con el id: " + id});
+        }
+
+        if(!usuario.imgAvatar){
+            return res.status(404).send("No existe imagen");
+        }
+
+        //CONFIGURAR HEADERS PARA LA IMAGEN
+        res.set("Content-Type", usuario.mimetype);
+        res.set("Cache-Cntrol", "public, max-age=3600");
+
+        res.send(usuario.imgAvatar);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+}

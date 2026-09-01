@@ -10,6 +10,7 @@ const app = express();
 //MIDDLEWARES GLOBALES
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(fileUpload()); // req.files para archivos y req.body paara textos
 
 
 //RUTAS ENDPOINTS
