@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+        }
+
+        .container-main {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .tabla-usuarios {
+            margin-top: 30px;
+        }
+
+        .img-avatar {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #007bff;
+        }
+
+        .btn-loading {
+            pointer-events: none;
+        }
+
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.25em;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+        }
+
+        .table thead {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .estado-carga {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container container-main" style="max-width: 1000px;">
+        <h1 class="text-center mb-4">
+            <i class="bi bi-people"></i> Gestión de Usuarios
+        </h1>
+
+        <!-- Alerta de error -->
+        <div id="alertaError" class="alert alert-danger alert-dismissible fade hide" role="alert">
+            <strong>Error:</strong> <span id="mensajeError"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Botón de recarga -->
+        <div class="mb-3 text-end">
+            <button id="btnRecargar" class="btn btn-primary" onclick="cargarUsuarios()">
+                <i class="bi bi-arrow-clockwise"></i> Recargar Usuarios
+            </button>
+        </div>
+
+        <!-- Spinner de carga -->
+        <div id="estadoCarga" class="estado-carga hide">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2 text-muted">Cargando usuarios...</p>
+        </div>
+
+        <!-- Tabla de usuarios -->
+        <div id="tablaUsuariosContainer" class="tabla-usuarios hide">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 80px;">Avatar</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla">
+                        <!-- Los usuarios se cargarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <p id="totalUsuarios" class="text-muted text-center mt-3">
+                Total de usuarios: <strong id="conteoUsuarios">0</strong>
+            </p>
+        </div>
+
+        <!-- Mensaje sin usuarios -->
+        <div id="sinUsuarios" class="alert alert-info text-center hide">
+            <p>No hay usuarios disponibles.</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Función para cargar usuarios
+        async function cargarUsuarios() {
+            try {
+                // Mostrar spinner de carga
+                mostrarEstadoCarga(true);
+                ocultarAlerta();
+
+                // Realizar petición al endpoint
+                const respuesta = await fetch('/api/usuarios');
+                const datos = await respuesta.json();
+
+                // Validar respuesta
+                if (!respuesta.ok || datos.status !== 'ok') {
+                    throw new Error(datos.message || 'Error al cargar los usuarios');
+                }
+
+                // Procesar usuarios
+                const usuarios = datos.usuarios || [];
+
+                if (usuarios.length === 0) {
+                    mostrarSinUsuarios();
+                    return;
+                }
+
+                // Llenar tabla
+                llenarTabla(usuarios, datos.totalUsuarios);
+                mostrarTabla();
+
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError(error.message || 'Error al cargar los usuarios');
+                ocultarTabla();
+            } finally {
+                mostrarEstadoCarga(false);
+            }
+        }
+
+        // Función para llenar la tabla con usuarios
+        function llenarTabla(usuarios, total) {
+            const tbody = document.getElementById('cuerpoTabla');
+            tbody.innerHTML = ''; // Limpiar tabla
+
+            usuarios.forEach(usuario => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>
+                        <img src="${usuario.urlAvatar}" alt="Avatar de ${usuario.nombre}" class="img-avatar" onerror="this.src='/default-avatar.svg'">
+                    </td>
+                    <td><span class="badge bg-secondary">${usuario.id}</span></td>
+                    <td><strong>${usuario.nombre}</strong></td>
+                    <td><a href="mailto:${usuario.email}">${usuario.email}</a></td>
+                `;
+                tbody.appendChild(fila);
+            });
+
+            // Actualizar contador
+            document.getElementById('conteoUsuarios').textContent = total;
+        }
+
+        // Función para mostrar error
+        function mostrarError(mensaje) {
+            const alerta = document.getElementById('alertaError');
+            const mensajeSpan = document.getElementById('mensajeError');
+            mensajeSpan.textContent = mensaje;
+            alerta.classList.remove('hide');
+            alerta.classList.add('show');
+        }
+
+        // Función para ocultar alerta
+        function ocultarAlerta() {
+            const alerta = document.getElementById('alertaError');
+            alerta.classList.remove('show');
+            alerta.classList.add('hide');
+        }
+
+        // Función para mostrar/ocultar estado de carga
+        function mostrarEstadoCarga(mostrar) {
+            const estado = document.getElementById('estadoCarga');
+            const boton = document.getElementById('btnRecargar');
+
+            if (mostrar) {
+                estado.classList.remove('hide');
+                boton.disabled = true;
+                boton.classList.add('btn-loading');
+            } else {
+                estado.classList.add('hide');
+                boton.disabled = false;
+                boton.classList.remove('btn-loading');
+            }
+        }
+
+        // Función para mostrar tabla
+        function mostrarTabla() {
+            const container = document.getElementById('tablaUsuariosContainer');
+            const sinUsuarios = document.getElementById('sinUsuarios');
+            container.classList.remove('hide');
+            sinUsuarios.classList.add('hide');
+        }
+
+        // Función para ocultar tabla
+        function ocultarTabla() {
+            const container = document.getElementById('tablaUsuariosContainer');
+            container.classList.add('hide');
+        }
+
+        // Función para mostrar mensaje sin usuarios
+        function mostrarSinUsuarios() {
+            const container = document.getElementById('tablaUsuariosContainer');
+            const sinUsuarios = document.getElementById('sinUsuarios');
+            container.classList.add('hide');
+            sinUsuarios.classList.remove('hide');
+        }
+
+        // Cargar usuarios al cargar la página
+        document.addEventListener('DOMContentLoaded', cargarUsuarios);
+    </script>
+</body>
+
+</html>

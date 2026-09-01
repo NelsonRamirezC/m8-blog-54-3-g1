@@ -6,12 +6,11 @@ import fileUpload from "express-fileupload";
 
 const app = express();
 
-
 //MIDDLEWARES GLOBALES
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload()); // req.files para archivos y req.body paara textos
-
+app.use(express.static("public")); // Middleware para servir archivos estáticos de la carpeta public
 
 //RUTAS ENDPOINTS
 app.use("/api/usuarios", usuariosRoutes);
