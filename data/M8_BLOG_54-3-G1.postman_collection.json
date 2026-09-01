@@ -1,0 +1,373 @@
+{
+  "info": {
+    "_postman_id": "43b6d1eb-348e-4ed2-b28a-997cae3dd2ff",
+    "name": "M8_BLOG_54-3-G1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12060319"
+  },
+  "item": [
+    {
+      "name": "USUARIOS",
+      "item": [
+        {
+          "name": "GET ALL USUARIOS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:3000/api/usuarios",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "offset",
+                  "value": "30",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREATE USUARIO",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nombre",
+                  "value": "Pedro",
+                  "type": "text",
+                  "uuid": "a52fe957-0760-4a19-9aea-f185a3952b82"
+                },
+                {
+                  "key": "email",
+                  "value": "pedro.avatar3@gmail.com",
+                  "type": "text",
+                  "uuid": "b7bc665f-0dab-4ae8-a598-a41884819e0a"
+                },
+                {
+                  "key": "password",
+                  "value": "123456",
+                  "type": "text",
+                  "uuid": "5fe19919-6574-4e1e-8c6c-2021cc9b8e6c"
+                },
+                {
+                  "key": "avatar",
+                  "type": "file",
+                  "uuid": "39f9e7b0-9382-44ad-9558-ef869362bbfa",
+                  "src": "/C:/Users/NelsonRamírez/Downloads/avatar.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "localhost:3000/api/usuarios",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE USUARIO",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "nombre",
+                  "value": "Pedro Soto",
+                  "type": "text",
+                  "uuid": "5060d986-b037-4808-ac98-a8bd019eb26a"
+                },
+                {
+                  "key": "email",
+                  "value": "pedro.soto@gmail.com",
+                  "type": "text",
+                  "uuid": "4b25d2e1-4d2d-4d8f-8c51-ec60ef5a466e"
+                },
+                {
+                  "key": "password",
+                  "value": "123456",
+                  "type": "text",
+                  "uuid": "3559c896-52e8-424c-abf9-7a7adf57ed37"
+                }
+              ]
+            },
+            "url": {
+              "raw": "localhost:3000/api/usuarios",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOGIN USUARIO",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "marta.figueroa@gmail.com",
+                  "type": "text",
+                  "uuid": "4b25d2e1-4d2d-4d8f-8c51-ec60ef5a466e"
+                },
+                {
+                  "key": "password",
+                  "value": "1234567",
+                  "type": "text",
+                  "uuid": "3559c896-52e8-424c-abf9-7a7adf57ed37"
+                }
+              ]
+            },
+            "url": {
+              "raw": "localhost:3000/api/usuarios/login",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "usuarios",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE USUARIO BY ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "localhost:3000/api/usuarios/3",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "usuarios",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET AVATAR IMAGE",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "nombre",
+                  "value": "Pedro Soto",
+                  "type": "text",
+                  "uuid": "5060d986-b037-4808-ac98-a8bd019eb26a"
+                },
+                {
+                  "key": "email",
+                  "value": "pedro.soto@gmail.com",
+                  "type": "text",
+                  "uuid": "4b25d2e1-4d2d-4d8f-8c51-ec60ef5a466e"
+                },
+                {
+                  "key": "password",
+                  "value": "123456",
+                  "type": "text",
+                  "uuid": "3559c896-52e8-424c-abf9-7a7adf57ed37"
+                }
+              ]
+            },
+            "url": {
+              "raw": "localhost:3000/api/usuarios/6/avatar",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "usuarios",
+                "6",
+                "avatar"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "PUBLICACIONES",
+      "item": [
+        {
+          "name": "GET ALL PUBLICACIONES",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:3000/api/publicaciones",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "publicaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ALL PUBLICACIONES BY ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:3000/api/publicaciones/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "publicaciones",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CREAR PUBLICACION",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "usuarioId",
+                  "value": "2",
+                  "type": "text",
+                  "uuid": "77419416-bfce-4420-a516-139c2025c995"
+                },
+                {
+                  "key": "titulo",
+                  "value": "Publicacion 1 de Pedro Soto",
+                  "type": "text",
+                  "uuid": "edd41bac-7a51-4796-ad97-ba1276b4c49f"
+                },
+                {
+                  "key": "contenido",
+                  "value": "Contenido publicación de Pedro Soto",
+                  "type": "text",
+                  "uuid": "35ae9a69-58b5-4111-98ba-d41e3ce0bf84"
+                }
+              ]
+            },
+            "url": {
+              "raw": "localhost:3000/api/publicaciones",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "publicaciones"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "COMENTARIOS",
+      "item": [
+        {
+          "name": "CREAR COMENTARIO",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "publicacionId",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "6b7721f7-7370-419d-b4fe-96eecf966a0a"
+                },
+                {
+                  "key": "usuarioId",
+                  "value": "3",
+                  "type": "text",
+                  "uuid": "b1206016-16a1-4961-88fa-266f40051bc3"
+                },
+                {
+                  "key": "contenido",
+                  "value": "Me gustó la publicación",
+                  "type": "text",
+                  "uuid": "a2034299-17fd-4c0f-873f-7479e51b615d"
+                }
+              ]
+            },
+            "url": {
+              "raw": "localhost:3000/api/comentarios",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "comentarios"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
