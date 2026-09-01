@@ -37,6 +37,14 @@ Usuario.init(
             allowNull: false,
             defaultValue: true,
         },
+        mimetype: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+        },
+        imgAvatar: {
+            type: DataTypes.BLOB,
+            allowNull: true
+        }
     },
     {
         sequelize,

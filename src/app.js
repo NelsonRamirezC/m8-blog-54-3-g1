@@ -2,6 +2,7 @@ import express from "express";
 import usuariosRoutes from "./routes/usuarios.routes.js";
 import publicacionesRoutes from "./routes/publicaciones.routes.js";
 import comentariosRoutes from "./routes/comentarios.routes.js";
+import fileUpload from "express-fileupload";
 
 const app = express();
 
