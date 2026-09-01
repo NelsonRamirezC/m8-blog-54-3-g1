@@ -33,7 +33,14 @@ export const getAllUsuarios = async (req, res) => {
             order: orderClause,
         });
 
-        res.json({ status: "ok", totalUsuarios: count, usuarios: rows });
+        const usuarios = rows.map(u => {
+            u = u.toJSON();
+            u.urlAvatar = `/api/usuarios/${u.id}/avatar`;
+
+            return u;
+        });
+
+        res.json({ status: "ok", totalUsuarios: count, usuarios });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Error interno del servidor" });
