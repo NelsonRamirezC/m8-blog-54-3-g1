@@ -1,6 +1,7 @@
 import express from "express";
 import * as publicacionesController from "../controllers/publicaciones.controller.js";
 import validateBody from "../middlewares/validateBody.js";
+import verifyToken from "../middlewares/verifyToken.js";
 
 const publicacionesRoutes = express.Router();
 
@@ -11,7 +12,7 @@ publicacionesRoutes.get("/", publicacionesController.getAllPublicaciones);
 publicacionesRoutes.get("/:id", publicacionesController.getPublicacionById);
 
 //CREAR PUBLICACIONES
-publicacionesRoutes.post("/", validateBody, publicacionesController.createPublicacion);
+publicacionesRoutes.post("/", validateBody, verifyToken, publicacionesController.createPublicacion);
 
 //ACTUALIZAR PUBLICACIONES
 publicacionesRoutes.put("/:id", validateBody, publicacionesController.updatePublicacion);

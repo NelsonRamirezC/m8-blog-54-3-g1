@@ -76,18 +76,23 @@ export const getPublicacionById = async (req, res) => {
 export const createPublicacion = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const { usuarioId, titulo, contenido } = obtenerDatosPublicacion(
+        const { titulo, contenido } = obtenerDatosPublicacion(
             req.body,
         );
 
-        if (!usuarioId || !titulo || !contenido) {
+
+        if (!titulo || !contenido) {
             await t.rollback();
             return res.status(400).json({
                 status: "fail",
                 message:
-                    "Se requieren los campos: usuarioId, titulo y contenido.",
+                    "Se requieren los campos: titulo y contenido.",
             });
         }
+
+        let userToken = req.userToken;
+
+        let usuarioId = userToken.id;
 
         const usuario = await Usuario.findByPk(usuarioId, { transaction: t });
         if (!usuario) {
