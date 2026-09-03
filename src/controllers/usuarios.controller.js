@@ -187,7 +187,20 @@ export const login = async (req, res) => {
 export const updateUsuario = async (req, res) => {
     const t = await sequelize.transaction();
     try {
+
+        let userToken = req.userToken;
+
         let { id } = req.params;
+
+        if (userToken.id != id) {
+            if (!userToken.admin) {
+                return res.status(403).json({
+                    status: "fail",
+                    message: `Usted no tiene los permisos necesarios para actualizar la cuenta del usuario id: ${id}`,
+                });
+            }
+        }
+
 
         let { nombre, email, password } = req.body;
 

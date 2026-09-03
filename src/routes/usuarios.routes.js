@@ -10,7 +10,7 @@ const usuariosRoutes = express.Router();
 usuariosRoutes.get("/", usuariosController.getAllUsuarios);
 
 //ACTUALIZAR DATOS DEL USUARIO
-usuariosRoutes.put("/:id", validateBody, usuariosController.updateUsuario);
+usuariosRoutes.put("/:id", validateBody, verifyToken, usuariosController.updateUsuario);
 
 //ELIMINAR USUARIO
 usuariosRoutes.delete("/:id", verifyToken, usuariosController.deleteUsuario);
