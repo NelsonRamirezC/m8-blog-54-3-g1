@@ -1,6 +1,7 @@
 import express from "express";
 import * as usuariosController from "../controllers/usuarios.controller.js";
 import validateBody from "../middlewares/validateBody.js";
+import verifyToken from "../middlewares/verifyToken.js";
 
 
 const usuariosRoutes = express.Router();
@@ -12,7 +13,7 @@ usuariosRoutes.get("/", usuariosController.getAllUsuarios);
 usuariosRoutes.put("/:id", validateBody, usuariosController.updateUsuario);
 
 //ELIMINAR USUARIO
-usuariosRoutes.delete("/:id", usuariosController.deleteUsuario);
+usuariosRoutes.delete("/:id", verifyToken, usuariosController.deleteUsuario);
 
 //REGISTRAR NUEVOS USUARIOS
 usuariosRoutes.post("/", validateBody, usuariosController.createUsuario);

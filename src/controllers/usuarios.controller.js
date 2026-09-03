@@ -1,6 +1,7 @@
 import Usuario from "../models/Usuario.model.js";
 import sequelize from "../config/db.js";
 import { generarHash, decodeHash } from "../utils/utils.js";
+import jwt from "jsonwebtoken";
 
 export const getAllUsuarios = async (req, res) => {
     try {
@@ -33,7 +34,7 @@ export const getAllUsuarios = async (req, res) => {
             order: orderClause,
         });
 
-        const usuarios = rows.map(u => {
+        const usuarios = rows.map((u) => {
             u = u.toJSON();
             u.urlAvatar = `/api/usuarios/${u.id}/avatar`;
 
@@ -102,17 +103,12 @@ export const createUsuario = async (req, res) => {
             });
         }
 
-
-
         let passwordHash = generarHash(password);
-
 
         //TOMAR DATA EN BINARIO COMPATIBLE CON CAMPO DE TIPO BLOB DE POSTGRESQL Y EL MIMETYPE
 
         const imgAvatar = avatar.data;
         const mimetype = avatar.mimetype;
-
-
 
         let newUsuario = await Usuario.create(
             { nombre, email, password: passwordHash, imgAvatar, mimetype },
@@ -121,11 +117,11 @@ export const createUsuario = async (req, res) => {
 
         newUsuario = newUsuario.toJSON();
 
-        let usuarioObj = { 
+        let usuarioObj = {
             id: newUsuario.id,
             nombre: newUsuario.nombre,
-            email: newUsuario.email
-        }
+            email: newUsuario.email,
+        };
 
         await t.commit();
         res.json({ status: "ok", usuario: usuarioObj });
@@ -164,9 +160,22 @@ export const login = async (req, res) => {
             });
         }
 
-        await t.commit();
+        const payload = {
+            id: usuario.id,
+            nombre: usuario.nombre,
+            admin: usuario.admin,
+            status: usuario.status,
+        };
 
-        res.json({ status: "ok", message: "Login correcto." });
+        const llaveSecreta = process.env.SECRETO_JWT;
+
+        const token = jwt.sign(payload, llaveSecreta, {
+            algorithm: "HS256",
+            expiresIn: "5m",
+        });
+
+        await t.commit();
+        res.json({ status: "ok", message: "Login correcto.", token });
     } catch (error) {
         await t.rollback();
         console.log(error);
@@ -218,7 +227,24 @@ export const updateUsuario = async (req, res) => {
 export const deleteUsuario = async (req, res) => {
     const t = await sequelize.transaction();
     try {
+        if (!req.userToken) {
+            return res.status(401).json({
+                status: "fail",
+                message: `No está autorizado a realizar está solicitud, primero inicie sesión.`,
+            });
+        }
+
+        let userToken = req.userToken;
         let { id } = req.params;
+
+        if (userToken.id != id) {
+            if (!userToken.admin) {
+                return res.status(403).json({
+                    status: "fail",
+                    message: `Usted no tiene los permisos necesarios para eliminar la cuenta del usuario id: ${id}`,
+                });
+            }
+        }
 
         const result = await Usuario.destroy({
             where: { id },
@@ -245,21 +271,25 @@ export const deleteUsuario = async (req, res) => {
     }
 };
 
-
 //ELIMINAR USUARIOS POR ID
 export const getAvatar = async (req, res) => {
     try {
         let { id } = req.params;
 
         const usuario = await Usuario.findByPk(id, {
-            attributes: ["imgAvatar", "mimetype"]
+            attributes: ["imgAvatar", "mimetype"],
         });
 
-        if(!usuario){
-            return res.status(400).json({ status: "fail", message: "No existe un usuaro con el id: " + id});
+        if (!usuario) {
+            return res
+                .status(400)
+                .json({
+                    status: "fail",
+                    message: "No existe un usuaro con el id: " + id,
+                });
         }
 
-        if(!usuario.imgAvatar){
+        if (!usuario.imgAvatar) {
             return res.status(404).send("No existe imagen");
         }
 
@@ -268,9 +298,8 @@ export const getAvatar = async (req, res) => {
         res.set("Cache-Cntrol", "public, max-age=3600");
 
         res.send(usuario.imgAvatar);
-
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Error interno del servidor" });
     }
-}
+};
