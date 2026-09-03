@@ -74,7 +74,6 @@ export const getComentarioById = async (req, res) => {
 export const createComentario = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-
         const userToken = req.userToken;
         let usuarioId = userToken.id;
 
@@ -84,13 +83,14 @@ export const createComentario = async (req, res) => {
             await t.rollback();
             return res.status(400).json({
                 status: "fail",
-                message:
-                    "Se requieren los campos: publicacionId y contenido.",
+                message: "Se requieren los campos: publicacionId y contenido.",
             });
         }
 
-        const publicacion= await Publicacion.findByPk(publicacionId, { transaction: t });
-        
+        const publicacion = await Publicacion.findByPk(publicacionId, {
+            transaction: t,
+        });
+
         if (!publicacion) {
             await t.rollback();
             return res.status(404).json({
@@ -178,18 +178,30 @@ export const deleteComentario = async (req, res) => {
     const t = await sequelize.transaction();
     try {
         const { id } = req.params;
-        const result = await Comentario.destroy({
-            where: { id },
-            transaction: t,
-        });
+        const userToken = req.userToken;
 
-        if (!result) {
+        const comentario = await Comentario.findByPk(id);
+
+        if (!comentario) {
             await t.rollback();
             return res.status(404).json({
                 status: "fail",
                 message: `No se encontró ningún comentario con id: ${id}.`,
             });
         }
+
+        if (!userToken.admin) {
+            if (comentario.usuarioId != userToken.id) {
+                await t.rollback();
+                return res.status(403).json({
+                    status: "fail",
+                    message:
+                        "Usted no tiene los permisos necesarios para eliminar el comentario.",
+                });
+            }
+        }
+
+        await comentario.destroy({ transaction: t});
 
         await t.commit();
         res.json({

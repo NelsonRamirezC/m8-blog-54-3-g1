@@ -18,6 +18,6 @@ comentariosRoutes.post("/", validateBody, verifyToken, comentariosController.cre
 comentariosRoutes.put("/:id", validateBody,comentariosController.updateComentario);
 
 //ELIMINAR COMENTARIOS POR ID
-comentariosRoutes.delete("/:id", comentariosController.deleteComentario);
+comentariosRoutes.delete("/:id", verifyToken, comentariosController.deleteComentario);
 
 export default comentariosRoutes;
