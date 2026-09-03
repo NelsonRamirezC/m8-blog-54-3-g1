@@ -188,7 +188,7 @@ export const updateUsuario = async (req, res) => {
     const t = await sequelize.transaction();
     try {
 
-        let userToken = req.userToken;
+        const userToken = req.userToken;
 
         let { id } = req.params;
 

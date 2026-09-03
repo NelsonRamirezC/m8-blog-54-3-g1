@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import Usuario from "../models/Usuario.model.js";
 
 const verifyToken = (req, res, next) => {
     console.log(req.headers);
@@ -14,7 +15,7 @@ const verifyToken = (req, res, next) => {
 
     const token = bearerToken.split(" ")[1];
 
-    jwt.verify(token, process.env.SECRETO_JWT, (error, decoded) => {
+    jwt.verify(token, process.env.SECRETO_JWT, async (error, decoded) => {
         if (error) {
             return res
                 .status(401)
@@ -26,6 +27,18 @@ const verifyToken = (req, res, next) => {
         }
 
         req.userToken = decoded;
+
+        const usuario = await Usuario.findByPk(decoded.id);
+
+        if(!usuario){
+            return res
+                .status(404)
+                .json({
+                    status: "Not found",
+                    message:
+                        "No existe un usuario en la BD con el ID:" + decoded.id,
+                });
+        }
 
         next();
     });

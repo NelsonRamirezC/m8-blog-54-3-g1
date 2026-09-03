@@ -74,35 +74,28 @@ export const getComentarioById = async (req, res) => {
 export const createComentario = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const { publicacionId, usuarioId, contenido } = obtenerDatosComentario(req.body);
 
-        if (!publicacionId || !usuarioId || !contenido) {
+        const userToken = req.userToken;
+        let usuarioId = userToken.id;
+
+        const { publicacionId, contenido } = obtenerDatosComentario(req.body);
+
+        if (!publicacionId || !contenido) {
             await t.rollback();
             return res.status(400).json({
                 status: "fail",
                 message:
-                    "Se requieren los campos: publicacionId, usuarioId y contenido.",
+                    "Se requieren los campos: publicacionId y contenido.",
             });
         }
 
-        const [publicacion, usuario] = await Promise.all([
-            Publicacion.findByPk(publicacionId, { transaction: t }),
-            Usuario.findByPk(usuarioId, { transaction: t }),
-        ]);
-
+        const publicacion= await Publicacion.findByPk(publicacionId, { transaction: t });
+        
         if (!publicacion) {
             await t.rollback();
             return res.status(404).json({
                 status: "fail",
                 message: `No se encontró ninguna publicación con id: ${publicacionId}.`,
-            });
-        }
-
-        if (!usuario) {
-            await t.rollback();
-            return res.status(404).json({
-                status: "fail",
-                message: `No se encontró ningún usuario con id: ${usuarioId}.`,
             });
         }
 

@@ -1,6 +1,7 @@
 import express from "express";
 import * as comentariosController from "../controllers/comentarios.controller.js";
 import validateBody from "../middlewares/validateBody.js";
+import verifyToken from "../middlewares/verifyToken.js";
 
 const comentariosRoutes = express.Router();
 
@@ -11,7 +12,7 @@ comentariosRoutes.get("/", comentariosController.getAllComentarios);
 comentariosRoutes.get("/:id", comentariosController.getComentarioById);
 
 //CREAR COMENTARIOS
-comentariosRoutes.post("/", validateBody, comentariosController.createComentario);
+comentariosRoutes.post("/", validateBody, verifyToken, comentariosController.createComentario);
 
 //ACTUALIZAR COMENTARIOS
 comentariosRoutes.put("/:id", validateBody,comentariosController.updateComentario);
