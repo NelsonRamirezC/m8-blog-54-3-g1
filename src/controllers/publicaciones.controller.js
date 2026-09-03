@@ -76,17 +76,13 @@ export const getPublicacionById = async (req, res) => {
 export const createPublicacion = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const { titulo, contenido } = obtenerDatosPublicacion(
-            req.body,
-        );
-
+        const { titulo, contenido } = obtenerDatosPublicacion(req.body);
 
         if (!titulo || !contenido) {
             await t.rollback();
             return res.status(400).json({
                 status: "fail",
-                message:
-                    "Se requieren los campos: titulo y contenido.",
+                message: "Se requieren los campos: titulo y contenido.",
             });
         }
 
@@ -126,10 +122,13 @@ export const createPublicacion = async (req, res) => {
 export const updatePublicacion = async (req, res) => {
     const t = await sequelize.transaction();
     try {
-        const { id } = req.params;
+        let userToken = req.userToken;
+
+        let { id } = req.params;
+
         const datos = obtenerDatosPublicacion(req.body);
 
-        if (!datos.usuarioId || !datos.titulo || !datos.contenido) {
+        if (!datos.titulo || !datos.contenido) {
             await t.rollback();
             return res.status(400).json({
                 status: "fail",
@@ -147,15 +146,15 @@ export const updatePublicacion = async (req, res) => {
             });
         }
 
-        const usuario = await Usuario.findByPk(datos.usuarioId, {
-            transaction: t,
-        });
-        if (!usuario) {
-            await t.rollback();
-            return res.status(404).json({
-                status: "fail",
-                message: `No se encontró ningún usuario con id: ${datos.usuarioId}.`,
-            });
+        //VALIDAR SI LA PUBLICACIÓN PERTENECE AL USUARIO QUE LA QUIERE MODIFICAR
+        if (!userToken.admin) {
+            if (userToken.id != publicacion.usuarioId) {
+                await t.rollback();
+                return res.status(403).json({
+                    status: "fail",
+                    message: `Usted no tiene permisos para editar a publicación`,
+                });
+            }
         }
 
         await publicacion.update(datos, { transaction: t });

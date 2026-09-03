@@ -15,7 +15,7 @@ publicacionesRoutes.get("/:id", publicacionesController.getPublicacionById);
 publicacionesRoutes.post("/", validateBody, verifyToken, publicacionesController.createPublicacion);
 
 //ACTUALIZAR PUBLICACIONES
-publicacionesRoutes.put("/:id", validateBody, publicacionesController.updatePublicacion);
+publicacionesRoutes.put("/:id", validateBody, verifyToken, publicacionesController.updatePublicacion);
 
 //ELIMINAR PUBLICACIONES POR ID
 publicacionesRoutes.delete("/:id", publicacionesController.deletePublicacion);
