@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { BaseError } from "sequelize";
 
 const verifyToken = (req, res, next) => {
     console.log(req.headers);
