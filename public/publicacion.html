@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Publicación | M8 Blog</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body>
+        <header data-nav></header>
+        <main class="page-wrap">
+            <div class="container">
+                <a class="btn btn-sm btn-outline-dark mb-4" href="index.html"
+                    >&larr; Volver</a
+                >
+                <div data-message hidden></div>
+                <article id="post" class="surface p-4 p-md-5 mb-4">
+                    Cargando publicación...
+                </article>
+                <section class="surface p-4 p-md-5">
+                    <div
+                        class="d-flex justify-content-between align-items-center mb-4"
+                    >
+                        <h2 class="h3 mb-0">Comentarios</h2>
+                        <span id="comment-count" class="meta"></span>
+                    </div>
+                    <div id="comments"></div>
+                    <form id="comment-form" class="mt-4" hidden>
+                        <label class="form-label" for="comment-content"
+                            >Añadir comentario</label
+                        ><textarea
+                            class="form-control mb-3"
+                            id="comment-content"
+                            rows="3"
+                            required
+                        ></textarea
+                        ><button class="btn btn-accent" type="submit">
+                            Publicar comentario
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </main>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="app.js"></script>
+        <script>
+            const postId = new URLSearchParams(location.search).get("id");
+            let currentPost;
+            async function loadPost() {
+                if (!postId)
+                    return showMessage("Falta el id de la publicación.");
+                try {
+                    ({ publicacion: currentPost } = await api(
+                        `/publicaciones/${postId}`,
+                    ));
+                    document.title = `${currentPost.titulo} | M8 Blog`;
+                    document.querySelector("#post").innerHTML =
+                        `<p class="eyebrow">${escapeHtml(currentPost.usuario?.nombre || "Autor desconocido")}</p><h1 class="display-title mb-4">${escapeHtml(currentPost.titulo)}</h1><p class="meta mb-4">Publicado: ${formatDate(currentPost.fechaCreacion)} · Actualizado: ${formatDate(currentPost.fechaActualizacion)}</p><div class="fs-5" style="white-space: pre-wrap">${escapeHtml(currentPost.contenido)}</div>`;
+                    const comments = currentPost.comentarios || [];
+                    document.querySelector("#comment-count").textContent =
+                        `${comments.length} comentario(s)`;
+                    document.querySelector("#comments").innerHTML =
+                        comments.length
+                            ? comments
+                                  .map(
+                                      (comment) =>
+                                          `<div class="comment mb-3"><strong>${escapeHtml(comment.usuario?.nombre || "Usuario")}</strong><p class="mb-1">${escapeHtml(comment.contenido)}</p><span class="meta">${formatDate(comment.fechaCreacion)}</span></div>`,
+                                  )
+                                  .join("")
+                            : '<p class="empty">Aún no hay comentarios.</p>';
+                    if (token())
+                        document.querySelector("#comment-form").hidden = false;
+                } catch (error) {
+                    showMessage(error.message);
+                }
+            }
+            document
+                .querySelector("#comment-form")
+                .addEventListener("submit", async (event) => {
+                    event.preventDefault();
+                    try {
+                        await api("/comentarios", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                publicacionId: Number(postId),
+                                contenido:
+                                    document.querySelector("#comment-content")
+                                        .value,
+                            }),
+                        });
+                        location.reload();
+                    } catch (error) {
+                        showMessage(error.message);
+                    }
+                });
+            loadPost();
+        </script>
+    </body>
+</html>

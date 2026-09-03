@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Publicaciones | M8 Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header data-nav></header>
+    <main class="page-wrap">
+        <div class="container">
+            <p class="eyebrow">La conversación continúa</p>
+            <h1 class="display-title mb-3">Publicaciones</h1>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
+                <p class="lead mb-0">Ideas, historias y voces de nuestra comunidad.</p>
+                <a class="btn btn-accent" href="nueva-publicacion.html">Crear publicación</a>
+            </div>
+            <div data-message hidden></div>
+            <div id="posts" class="row g-4">
+                <p class="empty">Cargando publicaciones...</p>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        async function loadPosts() { const target = document.querySelector("#posts"); try { const [postData, userData, commentData] = await Promise.all([api("/publicaciones"), api("/usuarios"), api("/comentarios")]); const users = Object.fromEntries(userData.usuarios.map(user => [user.id, user])); const comments = commentData.comentarios.reduce((counts, comment) => { counts[comment.publicacionId] = (counts[comment.publicacionId] || 0) + 1; return counts; }, {}); target.innerHTML = postData.publicaciones.length ? postData.publicaciones.map(post => `<div class="col-md-6 col-xl-4"><article class="post-card p-4"><a href="publicacion.html?id=${post.id}"><p class="eyebrow mb-3">${escapeHtml(users[post.usuarioId]?.nombre || "Autor desconocido")}</p><h2 class="post-title">${escapeHtml(post.titulo)}</h2><p class="meta mt-3 mb-0">${formatDate(post.fechaCreacion)}<br>Actualizada: ${formatDate(post.fechaActualizacion)}<br>${comments[post.id] || 0} comentario(s)</p></a></article></div>`).join("") : '<p class="empty">Todavía no hay publicaciones.</p>'; } catch (error) { showMessage(error.message); target.innerHTML = ""; } } loadPosts();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Registro | M8 Blog</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body>
+        <header data-nav></header>
+        <main class="page-wrap">
+            <div class="container">
+                <div
+                    class="surface mx-auto p-4 p-md-5"
+                    style="max-width: 560px"
+                >
+                    <p class="eyebrow">Únete a la comunidad</p>
+                    <h1 class="display-title mb-4">Crear cuenta</h1>
+                    <div data-message hidden></div>
+                    <form id="register-form" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label" for="nombre">Nombre</label
+                            ><input class="form-control" id="nombre" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="email">Email</label
+                            ><input
+                                class="form-control"
+                                type="email"
+                                id="email"
+                                required
+                                autocomplete="email"
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="password"
+                                >Password</label
+                            ><input
+                                class="form-control"
+                                type="password"
+                                id="password"
+                                minlength="8"
+                                required
+                                autocomplete="new-password"
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="reply-password"
+                                >Repetir password</label
+                            ><input
+                                class="form-control"
+                                type="password"
+                                id="reply-password"
+                                minlength="8"
+                                required
+                                autocomplete="new-password"
+                            />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label" for="avatar">Avatar</label
+                            ><input
+                                class="form-control"
+                                type="file"
+                                id="avatar"
+                                accept="image/jpeg,image/png,image/svg+xml"
+                                required
+                            />
+                        </div>
+                        <button class="btn btn-accent w-100" type="submit">
+                            Crear cuenta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="app.js"></script>
+        <script>
+            document
+                .querySelector("#register-form")
+                .addEventListener("submit", async (event) => {
+                    event.preventDefault();
+                    const password = document.querySelector("#password").value;
+                    if (
+                        password !==
+                        document.querySelector("#reply-password").value
+                    )
+                        return showMessage("Las contraseñas no coinciden.");
+                    const form = new FormData();
+                    form.append(
+                        "nombre",
+                        document.querySelector("#nombre").value,
+                    );
+                    form.append(
+                        "email",
+                        document.querySelector("#email").value,
+                    );
+                    form.append("password", password);
+                    form.append(
+                        "avatar",
+                        document.querySelector("#avatar").files[0],
+                    );
+                    try {
+                        await api("/usuarios", { method: "POST", body: form });
+                        location.href = "login.html";
+                    } catch (error) {
+                        showMessage(error.message);
+                    }
+                });
+        </script>
+    </body>
+</html>

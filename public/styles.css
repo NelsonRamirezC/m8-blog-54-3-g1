@@ -1,0 +1,127 @@
+:root {
+    --ink: #17252d;
+    --muted: #68757b;
+    --paper: #f5f1e8;
+    --card: #fffdf8;
+    --accent: #d56849;
+    --accent-dark: #ad4d35;
+    --line: #ded5c6;
+}
+
+body {
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at 10% 0%, #fffdf8 0, transparent 32%),
+        linear-gradient(135deg, var(--paper), #e9e0d2);
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.navbar {
+    background: var(--ink) !important;
+}
+.navbar-brand,
+.nav-link {
+    color: #fffdf8 !important;
+}
+.nav-link:hover {
+    color: #f2b59f !important;
+}
+.page-wrap {
+    padding: 4.5rem 0;
+}
+.eyebrow {
+    color: var(--accent);
+    font:
+        700 0.78rem Arial,
+        sans-serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+.display-title {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    line-height: 0.95;
+}
+.post-card,
+.surface {
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: rgba(255, 253, 248, 0.94);
+    box-shadow: 0 14px 36px rgba(23, 37, 45, 0.08);
+}
+.post-card {
+    height: 100%;
+    transition:
+        transform 160ms ease,
+        box-shadow 160ms ease;
+}
+.post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 42px rgba(23, 37, 45, 0.14);
+}
+.post-card a {
+    color: inherit;
+    text-decoration: none;
+}
+.post-title {
+    font-size: 1.7rem;
+}
+.meta {
+    color: var(--muted);
+    font:
+        0.82rem Arial,
+        sans-serif;
+}
+.form-label {
+    font:
+        700 0.78rem Arial,
+        sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.form-control,
+.btn,
+.alert,
+.table {
+    border-radius: 0;
+}
+.form-control {
+    border-color: var(--line);
+    padding: 0.75rem 0.85rem;
+    background: var(--card);
+}
+.form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.2rem rgba(213, 104, 73, 0.18);
+}
+.btn-accent {
+    color: #fffdf8;
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.btn-accent:hover {
+    color: #fffdf8;
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+.comment {
+    border-left: 3px solid var(--accent);
+    padding: 0.7rem 1rem;
+    background: #f9f5ed;
+}
+.table {
+    --bs-table-bg: transparent;
+    vertical-align: middle;
+}
+.table thead {
+    color: var(--muted);
+    font:
+        700 0.75rem Arial,
+        sans-serif;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+.empty {
+    color: var(--muted);
+    font-style: italic;
+}

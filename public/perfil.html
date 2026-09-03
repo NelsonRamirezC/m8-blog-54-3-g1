@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mi perfil | M8 Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header data-nav></header>
+    <main class="page-wrap">
+        <div class="container">
+            <p class="eyebrow">Cuenta personal</p>
+            <h1 class="display-title mb-4">Mi perfil</h1>
+            <div data-message hidden></div>
+            <section class="surface p-4 p-md-5 mb-4">
+                <div id="user-data">Cargando datos...</div>
+                <hr class="my-4">
+                <h2 class="h3 mb-3">Actualizar datos</h2>
+                <form id="profile-form" class="row g-3">
+                    <div class="col-md-6"><label class="form-label" for="nombre">Nombre</label><input
+                            class="form-control" id="nombre" required></div>
+                    <div class="col-md-6"><label class="form-label" for="email">Email</label><input class="form-control"
+                            type="email" id="email" required></div>
+                    <div class="col-md-6"><label class="form-label" for="password">Nuevo password</label><input
+                            class="form-control" type="password" id="password" minlength="8" required></div>
+                    <div class="col-md-6 d-flex align-items-end"><button class="btn btn-accent" type="submit">Actualizar
+                            cuenta</button></div>
+                </form><button id="delete-account" class="btn btn-outline-danger mt-4" type="button">Eliminar
+                    cuenta</button>
+            </section>
+            <section class="surface p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h3 mb-0">Mis publicaciones</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Creada</th>
+                                <th>Actualizada</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-posts">
+                            <tr>
+                                <td colspan="4" class="empty">Cargando publicaciones...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        if (requireAuth()) {
+            const userId = decodeToken().id; let user; async function loadProfile() { try { const [users, posts] = await Promise.all([api("/usuarios"), api("/publicaciones")]); user = users.usuarios.find(item => item.id === userId); if (!user) throw new Error("No se encontró el usuario."); document.querySelector("#user-data").innerHTML = `<p class="eyebrow mb-2">Usuario #${user.id}</p><h2 class="h3">${escapeHtml(user.nombre)}</h2><p class="meta mb-0">${escapeHtml(user.email)}</p>`; document.querySelector("#nombre").value = user.nombre; document.querySelector("#email").value = user.email; const mine = posts.publicaciones.filter(post => post.usuarioId === userId); document.querySelector("#my-posts").innerHTML = mine.length ? mine.map(post => `<tr><td>${escapeHtml(post.titulo)}</td><td>${formatDate(post.fechaCreacion)}</td><td>${formatDate(post.fechaActualizacion)}</td><td><a class="btn btn-sm btn-outline-dark" href="publicacion.html?id=${post.id}">Ver</a> <button class="btn btn-sm btn-outline-secondary" data-update-post="${post.id}" type="button">Actualizar</button> <button class="btn btn-sm btn-outline-danger" data-delete-post="${post.id}" type="button">Eliminar</button></td></tr>`).join("") : '<tr><td colspan="4" class="empty">No has creado publicaciones.</td></tr>'; } catch (error) { showMessage(error.message); } } loadProfile();
+            document.querySelector("#profile-form").addEventListener("submit", async event => { event.preventDefault(); try { await api(`/usuarios/${userId}`, { method: "PUT", body: JSON.stringify({ nombre: document.querySelector("#nombre").value, email: document.querySelector("#email").value, password: document.querySelector("#password").value }) }); showMessage("Datos actualizados correctamente.", "success"); } catch (error) { showMessage(error.message); } }); document.querySelector("#delete-account").addEventListener("click", async () => { if (!confirm("¿Eliminar tu cuenta y tus publicaciones?")) return; try { await api(`/usuarios/${userId}`, { method: "DELETE" }); localStorage.removeItem("token"); location.href = "index.html"; } catch (error) { showMessage(error.message); } }); document.querySelector("#my-posts").addEventListener("click", async event => { const updateButton = event.target.closest("[data-update-post]"); if (updateButton) { const result = await api(`/publicaciones/${updateButton.dataset.updatePost}`); const title = prompt("Título", result.publicacion.titulo); const content = prompt("Contenido", result.publicacion.contenido); if (title && content) { try { await api(`/publicaciones/${updateButton.dataset.updatePost}`, { method: "PUT", body: JSON.stringify({ titulo: title, contenido: content }) }); loadProfile(); } catch (error) { showMessage(error.message); } } return; } const button = event.target.closest("[data-delete-post]"); if (!button || !confirm("¿Eliminar esta publicación?")) return; try { await api(`/publicaciones/${button.dataset.deletePost}`, { method: "DELETE" }); loadProfile(); } catch (error) { showMessage(error.message); } });
+        }
+    </script>
+</body>
+
+</html>
